@@ -1,4 +1,5 @@
 class StoriesController < ApplicationController
+  before_action :authorize!
   # GET /stories
   def index
     @stories = Story.all.order(created_at: :desc)
