@@ -1,5 +1,5 @@
 class StoriesController < ApplicationController
-  before_action :authorize!
+  before_action :authorize!, except: [:index, :show]
   # GET /stories
   def index
     @stories = Story.all.order(created_at: :desc)
@@ -22,7 +22,8 @@ class StoriesController < ApplicationController
 
   # POST /stories
   def create
-    @story = Story.new(story_params)
+    # @story = Story.new(story_params)
+    @story = current_user.stories.create(story_params)
 
     if @story.save
       redirect_to root_path, notice: 'Story was successfully created.'
