@@ -1,5 +1,5 @@
 class StoriesController < ApplicationController
-  before_action :authorize!
+  before_action :authorize!, except: [:index, :show]
   # GET /stories
   def index
     @stories = Story.all.order(created_at: :desc)
@@ -18,11 +18,17 @@ class StoriesController < ApplicationController
   # GET /stories/1/edit
   def edit
     @story = Story.find(params[:id])
+
+    if @story.user != current_user
+      flash[:notice] = 'You are not allowed to edit this story!'
+      redirect_to @story
+    end
   end
 
   # POST /stories
   def create
-    @story = Story.new(story_params)
+    # @story = Story.new(story_params)
+    @story = current_user.stories.create(story_params)
 
     if @story.save
       redirect_to root_path, notice: 'Story was successfully created.'
@@ -34,7 +40,11 @@ class StoriesController < ApplicationController
   # PATCH/PUT /stories/1
   def update
     @story = Story.find(params[:id])
-    if @story.update(story_params)
+    if @story.user != current_user
+      flash[:notice] = 'You are not allowed to update this story!'
+      redirect_to @story
+    end
+      if @story.update(story_params)
       redirect_to @story, notice: 'Story was successfully updated.'
     else
       render :edit
@@ -44,6 +54,9 @@ class StoriesController < ApplicationController
   # DELETE /stories/1
   def destroy
     @story = Story.find(params[:id])
+    if @story.user != current_user
+    return render :text => 'Not Allowed', status: :forbidden
+    end
     @story.destroy
     redirect_to stories_url, notice: 'Story was successfully destroyed.'
   end
