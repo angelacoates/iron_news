@@ -18,9 +18,8 @@ class StoriesController < ApplicationController
   # GET /stories/1/edit
   def edit
     @story = Story.find(params[:id])
-
     if @story.user != current_user
-      flash[:notice] = 'You are not allowed to edit this story!'
+       flash[:notice] = 'You are not allowed to edit this story!'
       redirect_to @story
     end
   end
@@ -43,8 +42,8 @@ class StoriesController < ApplicationController
     if @story.user != current_user
       flash[:notice] = 'You are not allowed to update this story!'
       redirect_to @story
-    end
-      if @story.update(story_params)
+  end
+    if @story.update(story_params)
       redirect_to @story, notice: 'Story was successfully updated.'
     else
       render :edit
@@ -55,15 +54,16 @@ class StoriesController < ApplicationController
   def destroy
     @story = Story.find(params[:id])
     if @story.user != current_user
-    return render :text => 'Not Allowed', status: :forbidden
-    end
-    @story.destroy
-    redirect_to stories_url, notice: 'Story was successfully destroyed.'
+      return render :text => 'You must be the creator of this story to delete it', status: :forbidden
+    else
+      @story.destroy
+      redirect_to stories_url, notice: 'Story was successfully destroyed.'
   end
 
-  private
+    private
     # Only allow a trusted parameter "white list" through.
     def story_params
       params.require(:story).permit(:title, :url, :email)
     end
+  end
 end
