@@ -18,6 +18,11 @@ class StoriesController < ApplicationController
   # GET /stories/1/edit
   def edit
     @story = Story.find(params[:id])
+
+    if @story.user != current_user
+      flash[:notice] = 'You are not allowed to edit this story!'
+      redirect_to @story
+    end
   end
 
   # POST /stories
@@ -35,7 +40,11 @@ class StoriesController < ApplicationController
   # PATCH/PUT /stories/1
   def update
     @story = Story.find(params[:id])
-    if @story.update(story_params)
+    if @story.user != current_user
+      flash[:notice] = 'You are not allowed to update this story!'
+      redirect_to @story
+    end
+      if @story.update(story_params)
       redirect_to @story, notice: 'Story was successfully updated.'
     else
       render :edit
@@ -45,6 +54,9 @@ class StoriesController < ApplicationController
   # DELETE /stories/1
   def destroy
     @story = Story.find(params[:id])
+    if @story.user != current_user
+    return render :text => 'Not Allowed', status: :forbidden
+    end
     @story.destroy
     redirect_to stories_url, notice: 'Story was successfully destroyed.'
   end
