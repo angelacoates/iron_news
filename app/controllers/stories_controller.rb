@@ -26,8 +26,8 @@ class StoriesController < ApplicationController
 
   # POST /stories
   def create
-    # @story = Story.new(story_params)
-    @story = current_user.stories.create(story_params)
+    @story = Story.new(story_params)
+    @story.user = current_user
 
     if @story.save
       redirect_to root_path, notice: 'Story was successfully created.'
@@ -53,17 +53,17 @@ class StoriesController < ApplicationController
   # DELETE /stories/1
   def destroy
     @story = Story.find(params[:id])
-    if @story.user != current_user
-      return render :text => 'You must be the creator of this story to delete it', status: :forbidden
-    else
-      @story.destroy
-      redirect_to stories_url, notice: 'Story was successfully destroyed.'
+        if @story.user != current_user
+    return render :text => 'You must be the creator of this story to delete it', status: :forbidden
+        else
+    @story.destroy
+    redirect_to stories_url, notice: 'Story was successfully destroyed.'
+    end
   end
 
     private
     # Only allow a trusted parameter "white list" through.
     def story_params
-      params.require(:story).permit(:title, :url, :email)
+      params.require(:story).permit(:title, :url, :image)
     end
   end
-end
